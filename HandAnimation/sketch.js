@@ -63,7 +63,7 @@ function draw() {
   background(220);
   
   //display current frame of the current animation
-  image(currentAnimation[currentFrame], 0, 0);
+  image(currentAnimation[currentFrame], 0, 0, width, height);
   
   if(isPlaying && frameCount % 5 == 0) { // changes frame in a 10fps speed. isPlaying will go on playing untill...
     currentFrame++ // chnaging the frames
