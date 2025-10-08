@@ -1,0 +1,36 @@
+{
+  "frames": [
+    {
+      "name": "HAND 0",
+      "position": { "x": 0, "y": 0, "w": 322, "h": 181 }
+    },
+    {
+      "name": "HAND 1",
+      "position": { "x": 322, "y": 0, "w": 322, "h": 181 }
+    },
+    {
+      "name": "HAND 2",
+      "position": { "x": 644, "y": 0, "w": 322, "h": 181 }
+    },
+    {
+      "name": "HAND 3",
+      "position": { "x": 0, "y": 181, "w": 322, "h": 181 }
+    },
+    {
+      "name": "HAND 4",
+      "position": { "x": 322, "y": 181, "w": 322, "h": 181 }
+    },
+    {
+      "name": "HAND 5",
+      "position": { "x": 644, "y": 181, "w": 322, "h": 181 }
+    },
+    {
+      "name": "HAND 6",
+      "position": { "x": 0, "y": 362, "w": 322, "h": 182 }
+    },
+    {
+      "name": "HAND 7",
+      "position": { "x": 322, "y": 362, "w": 322, "h": 182 }
+    }
+  ]
+}
