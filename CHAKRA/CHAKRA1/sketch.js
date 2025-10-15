@@ -39,7 +39,7 @@ function setup() {
 }
 
 function draw() {
-  background(220);
+  background(255);
 
   // Draw sprite (body)
   image(animation[currentFrame], width / 2, height / 2 - 80, 640, 360);
@@ -49,7 +49,7 @@ function draw() {
   drawSymbol(symbolM, symbolM_img);
 
   // Animate sprite frames
-  if (isPlaying && frameCount % 5 === 0) {
+  if (isPlaying && frameCount % 7 === 0) {
     currentFrame += direction;
 
     // Animation bounds and direction logic
