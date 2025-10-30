@@ -37,7 +37,7 @@ function setup() {
     animation.push(spritesheet.get(pos.x, pos.y, pos.w, pos.h));
   }
 
-  setupSymbols(); // position clickable chakras
+  setupSymbols(); // set initial clickable symbol layout
   floatersCurrent = createFloaters();
 }
 
@@ -48,10 +48,11 @@ function setupSymbols() {
 
   if (height > width) {
     // 📱 Mobile layout (portrait)
-    let symbolY = height * 0.85;
-    let spacing = width * 0.18;
-    symbolA = { x: width / 2 - spacing / 2, y: symbolY, w: width * 0.18, h: width * 0.18, id: "A" };
-    symbolM = { x: width / 2 + spacing / 2, y: symbolY, w: width * 0.18, h: width * 0.18, id: "M" };
+    let symbolY = height * 0.85; // ⬆ symbols moved closer to body
+    let spacing = width * 0.25;
+    let size = width * 0.22;
+    symbolA = { x: width / 2 - spacing / 2, y: symbolY, w: size, h: size, id: "A" };
+    symbolM = { x: width / 2 + spacing / 2, y: symbolY, w: size, h: size, id: "M" };
   } else {
     // 💻 Desktop layout (landscape)
     symbolA = { x: bodyX - offsetX, y: bodyY, w: width * 0.1, h: width * 0.1, id: "A" };
@@ -91,25 +92,11 @@ function createFloaters() {
 function draw() {
   background(255);
 
-  // Update motion for current floaters
-  for (let f of floatersCurrent) {
-    f.floatAngle += 0.002;
-    f.x = f.centerX + cos(f.floatAngle) * f.floatRadius;
-    f.y = f.centerY + sin(f.floatAngle) * f.floatRadius;
-    f.selfRotation += f.selfRotationSpeed;
-  }
+  // Update floater motion
+  updateFloaters(floatersCurrent);
+  if (isTransitioning) updateFloaters(floatersNext);
 
-  // Update motion for next floaters if transitioning
-  if (isTransitioning) {
-    for (let f of floatersNext) {
-      f.floatAngle += 0.002;
-      f.x = f.centerX + cos(f.floatAngle) * f.floatRadius;
-      f.y = f.centerY + sin(f.floatAngle) * f.floatRadius;
-      f.selfRotation += f.selfRotationSpeed;
-    }
-  }
-
-  // Calculate fade alpha
+  // Manage crossfade transition
   let alphaCurrent = 255;
   let alphaNext = 0;
   if (isTransitioning) {
@@ -127,39 +114,67 @@ function draw() {
     }
   }
 
-  // Draw current floaters
-  let currentImg = currentFloaterSet === "M" ? symbolMT_img : symbolAT_img;
-  for (let f of floatersCurrent) {
-    push();
-    translate(f.x, f.y);
-    rotate(f.selfRotation);
-    tint(255, alphaCurrent);
-    image(currentImg, 0, 0, f.size, f.size);
-    pop();
-  }
-
-  // Draw next floaters if transitioning
+  // Draw floaters (current + next if fading)
+  drawFloaters(floatersCurrent, currentFloaterSet === "M" ? symbolMT_img : symbolAT_img, alphaCurrent);
   if (isTransitioning) {
-    let nextImg = currentFloaterSet === "M" ? symbolAT_img : symbolMT_img;
-    for (let f of floatersNext) {
-      push();
-      translate(f.x, f.y);
-      rotate(f.selfRotation);
-      tint(255, alphaNext);
-      image(nextImg, 0, 0, f.size, f.size);
-      pop();
-    }
+    drawFloaters(floatersNext, currentFloaterSet === "M" ? symbolAT_img : symbolMT_img, alphaNext);
   }
 
-  // Draw body sprite at center (scaled responsively)
-  let bodyScale = min(width * 0.7, height * 0.7);
-  image(animation[currentFrame], width / 2, height / 2, bodyScale, bodyScale * 0.56);
+  // Draw body sprite
+  drawBody();
 
   // Draw clickable symbols
   drawSymbol(symbolA, symbolA_img);
   drawSymbol(symbolM, symbolM_img);
 
-  // Animate body
+  // Animate body sprite
+  animateBody();
+}
+
+function updateFloaters(arr) {
+  for (let f of arr) {
+    f.floatAngle += 0.002;
+    f.x = f.centerX + cos(f.floatAngle) * f.floatRadius;
+    f.y = f.centerY + sin(f.floatAngle) * f.floatRadius;
+    f.selfRotation += f.selfRotationSpeed;
+  }
+}
+
+function drawFloaters(arr, img, alpha) {
+  for (let f of arr) {
+    push();
+    translate(f.x, f.y);
+    rotate(f.selfRotation);
+    tint(255, alpha);
+    image(img, 0, 0, f.size, f.size);
+    pop();
+  }
+}
+
+function drawBody() {
+  let bodyScale;
+  if (height > width) {
+    // 📱 Mobile — make the body larger
+    bodyScale = min(width * 2, height * 1);
+  } else {
+    // 💻 Desktop
+    bodyScale = min(width * 0.7, height * 0.7);
+  }
+  image(animation[currentFrame], width / 2, height / 2, bodyScale, bodyScale * 0.56);
+}
+
+function drawSymbol(symbol, img) {
+  push();
+  imageMode(CENTER);
+  if (lastClicked === symbol.id) {
+    drawingContext.shadowBlur = 30;
+    drawingContext.shadowColor = color(255, 255, 120);
+  }
+  image(img, symbol.x, symbol.y, symbol.w, symbol.h);
+  pop();
+}
+
+function animateBody() {
   if (isPlaying && frameCount % 7 === 0) {
     currentFrame += direction;
     if (currentFrame >= animation.length) {
@@ -174,20 +189,8 @@ function draw() {
   }
 }
 
-function drawSymbol(symbol, img) {
-  push();
-  imageMode(CENTER);
-  if (lastClicked === symbol.id) {
-    drawingContext.shadowBlur = 30;
-    drawingContext.shadowColor = color(255, 255, 120);
-  }
-  image(img, symbol.x, symbol.y, symbol.w, symbol.h);
-  pop();
-}
-
 function mousePressed() {
   if (isPlaying || isTransitioning) return;
-
   if (insideSymbol(mouseX, mouseY, symbolA)) handleSymbolClick(symbolA);
   else if (insideSymbol(mouseX, mouseY, symbolM)) handleSymbolClick(symbolM);
 }
@@ -197,8 +200,7 @@ function handleSymbolClick(symbol) {
   isPlaying = true;
   lastClicked = symbol.id;
 
-  // Prepare new random floaters for crossfade
-  floatersNext = createFloaters();
+  floatersNext = createFloaters(); // new random set
   isTransitioning = true;
   transitionProgress = 0;
 }
