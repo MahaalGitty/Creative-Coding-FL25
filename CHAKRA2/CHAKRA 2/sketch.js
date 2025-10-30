@@ -30,14 +30,13 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   imageMode(CENTER);
 
-  // Load sprite frames
   let frames = spritedata.frames;
   for (let i = 0; i < frames.length; i++) {
     let pos = frames[i].position;
     animation.push(spritesheet.get(pos.x, pos.y, pos.w, pos.h));
   }
 
-  setupSymbols(); // set initial clickable symbol layout
+  setupSymbols();
   floatersCurrent = createFloaters();
 }
 
@@ -47,14 +46,14 @@ function setupSymbols() {
   let offsetX = width * 0.18;
 
   if (height > width) {
-    // 📱 Mobile layout (portrait)
-    let symbolY = height * 0.85; // ⬆ symbols moved closer to body
+    // Mobile layout: symbols below body
+    let symbolY = height * 0.85;
     let spacing = width * 0.25;
     let size = width * 0.22;
     symbolA = { x: width / 2 - spacing / 2, y: symbolY, w: size, h: size, id: "A" };
     symbolM = { x: width / 2 + spacing / 2, y: symbolY, w: size, h: size, id: "M" };
   } else {
-    // 💻 Desktop layout (landscape)
+    // Desktop layout: symbols left/right of body
     symbolA = { x: bodyX - offsetX, y: bodyY, w: width * 0.1, h: width * 0.1, id: "A" };
     symbolM = { x: bodyX + offsetX, y: bodyY, w: width * 0.1, h: width * 0.1, id: "M" };
   }
@@ -92,11 +91,9 @@ function createFloaters() {
 function draw() {
   background(0);
 
-  // Update floater motion
   updateFloaters(floatersCurrent);
   if (isTransitioning) updateFloaters(floatersNext);
 
-  // Manage crossfade transition
   let alphaCurrent = 255;
   let alphaNext = 0;
   if (isTransitioning) {
@@ -114,20 +111,16 @@ function draw() {
     }
   }
 
-  // Draw floaters (current + next if fading)
   drawFloaters(floatersCurrent, currentFloaterSet === "M" ? symbolMT_img : symbolAT_img, alphaCurrent);
   if (isTransitioning) {
     drawFloaters(floatersNext, currentFloaterSet === "M" ? symbolAT_img : symbolMT_img, alphaNext);
   }
 
-  // Draw body sprite
   drawBody();
 
-  // Draw clickable symbols
   drawSymbol(symbolA, symbolA_img);
   drawSymbol(symbolM, symbolM_img);
 
-  // Animate body sprite
   animateBody();
 }
 
@@ -152,15 +145,17 @@ function drawFloaters(arr, img, alpha) {
 }
 
 function drawBody() {
-  let bodyScale;
-  if (height > width) {
-    // 📱 Mobile — make the body larger
-    bodyScale = min(width * 1.8, height * 1.8);
-  } else {
-    // 💻 Desktop
-    bodyScale = min(width * 1.1, height * 1.1);
-  }
+  let bodyScale = height > width ? min(width * 1.8, height * 1.8) : min(width * 1.1, height * 1.1);
+
+  push();
+  // Glow effect on the body sprite itself
+  if (lastClicked === "A") drawingContext.shadowColor = 'rgba(255,50,50,0.7)'; // red for Ajna
+  else if (lastClicked === "M") drawingContext.shadowColor = 'rgba(80,180,255,0.7)'; // blue for Root
+  else drawingContext.shadowColor = 'rgba(255,255,180,0.5)'; // default
+
+  drawingContext.shadowBlur = 50;
   image(animation[currentFrame], width / 2, height / 2, bodyScale, bodyScale * 0.56);
+  pop();
 }
 
 function drawSymbol(symbol, img) {
@@ -191,16 +186,18 @@ function animateBody() {
 
 function mousePressed() {
   if (isPlaying || isTransitioning) return;
+
   if (insideSymbol(mouseX, mouseY, symbolA)) handleSymbolClick(symbolA);
   else if (insideSymbol(mouseX, mouseY, symbolM)) handleSymbolClick(symbolM);
 }
 
 function handleSymbolClick(symbol) {
   if (lastClicked === symbol.id) return;
+
   isPlaying = true;
   lastClicked = symbol.id;
 
-  floatersNext = createFloaters(); // new random set
+  floatersNext = createFloaters();
   isTransitioning = true;
   transitionProgress = 0;
 }
