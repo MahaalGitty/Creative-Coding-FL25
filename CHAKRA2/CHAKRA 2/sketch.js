@@ -90,7 +90,7 @@ function createFloaters() {
 }
 
 function draw() {
-  background(255);
+  background(0);
 
   // Update floater motion
   updateFloaters(floatersCurrent);
