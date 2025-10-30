@@ -148,10 +148,14 @@ function drawBody() {
   let bodyScale = height > width ? min(width * 1.8, height * 1.8) : min(width * 1.1, height * 1.1);
 
   push();
-  // Glow effect on the body sprite itself
-  if (lastClicked === "A") drawingContext.shadowColor = 'rgba(255,50,50,0.7)'; // red for Ajna
-  else if (lastClicked === "M") drawingContext.shadowColor = 'rgba(80,180,255,0.7)'; // blue for Root
+  // SWAPPED Glow effect on the body sprite
+  if (lastClicked === "A") drawingContext.shadowColor = 'rgba(255,50,50,0.7)'; // RED for Ajna
+  else if (lastClicked === "M") drawingContext.shadowColor = 'rgba(80,180,255,0.7)'; // BLUE for Root
   else drawingContext.shadowColor = 'rgba(255,255,180,0.5)'; // default
+
+  // Actually swap the colors:
+  if (lastClicked === "A") drawingContext.shadowColor = 'rgba(80,180,255,0.7)'; // BLUE for Ajna
+  else if (lastClicked === "M") drawingContext.shadowColor = 'rgba(255,50,50,0.7)'; // RED for Root
 
   drawingContext.shadowBlur = 50;
   image(animation[currentFrame], width / 2, height / 2, bodyScale, bodyScale * 0.56);
