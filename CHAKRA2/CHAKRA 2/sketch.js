@@ -155,10 +155,10 @@ function drawBody() {
   let bodyScale;
   if (height > width) {
     // 📱 Mobile — make the body larger
-    bodyScale = min(width * 2, height * 1);
+    bodyScale = min(width * 1.8, height * 1.8);
   } else {
     // 💻 Desktop
-    bodyScale = min(width * 0.7, height * 0.7);
+    bodyScale = min(width * 1.1, height * 1.1);
   }
   image(animation[currentFrame], width / 2, height / 2, bodyScale, bodyScale * 0.56);
 }
