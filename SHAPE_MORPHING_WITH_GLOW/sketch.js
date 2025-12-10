@@ -11,7 +11,7 @@ let n = 60;
 let shapeIndex = 0;
 
 function setup() {
-  createCanvas(800, 800);
+  createCanvas(windowWidth, windowHeight);
   let len = 200;
   let cx = width / 2;
   let cy = height / 2;
@@ -93,6 +93,11 @@ function draw() {
       }
     }
   }
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+
 }
 
 function mousePressed() {
