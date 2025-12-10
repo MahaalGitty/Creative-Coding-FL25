@@ -11,7 +11,7 @@ let glowFrames = 10;
 let glowT = 0;
 
 function setup() {
-  createCanvas(800, 800);
+  createCanvas(windowWidth, windowHeight);
   
   // Generate 3 smooth organic shapes
   for (let s = 0; s < 3; s++) {
@@ -70,6 +70,10 @@ function draw() {
       }
     }
   }
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
 }
 
 function mousePressed() {
